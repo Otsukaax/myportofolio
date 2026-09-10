@@ -373,7 +373,7 @@ h1,
 
 
 /* ============================================================
-   Section: Experience (Halaman experience.html)
+   Section: Experience
    ============================================================ */
 .experience-section {
     padding: 4rem 0;
@@ -427,4 +427,190 @@ h1,
     margin-top: 1rem;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+
+/* ============================================================
+   Section: Education – Timeline Layout
+   ============================================================ */
+.education-section {
+    padding: 4rem 0 5rem;
+    border-top: 1px solid var(--line);
+}
+
+/* Samakan style h1 dengan .experience-section h1 */
+.education-section h1 {
+    font-size: 2rem;
+    margin: 0.4rem 0 1.5rem;
+}
+
+/* Wrapper seluruh timeline */
+.edu-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Satu baris timeline (tahun | konektor | card) */
+.edu-timeline__item {
+    display: grid;
+    grid-template-columns: 7rem 2.5rem 1fr;
+    align-items: flex-start;
+    gap: 0 1rem;
+}
+
+/* ── Kolom kiri: tahun ── */
+.edu-timeline__year {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: right;
+}
+
+.edu-timeline__year-end--current {
+    color: var(--accent);
+}
+
+/* ── Kolom tengah: dot + garis vertikal ── */
+.edu-timeline__connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Sejajarkan dot dengan teks pertama di card */
+    padding-top: 0.35rem;
+}
+
+.edu-timeline__dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    border: 3px solid var(--paper);
+    outline: 2px solid var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.edu-timeline__item:hover .edu-timeline__dot {
+    transform: scale(1.3);
+}
+
+.edu-timeline__line {
+    display: none;
+}
+
+/* Baris terakhir: sembunyikan garis bawah */
+.edu-timeline__item:last-child .edu-timeline__line {
+    background-color: transparent;
+}
+
+/* ── Kolom kanan: card konten ── */
+.edu-timeline__card {
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.edu-timeline__card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(28, 25, 23, 0.1);
+    border-color: var(--accent);
+}
+
+.edu-timeline__card-header {
+    margin-bottom: 0.6rem;
+}
+
+/* Badge status (Sedang Berjalan / Lulus) */
+.edu-timeline__badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background-color: var(--line);
+    color: var(--text-muted);
+}
+
+.edu-timeline__badge--active {
+    background-color: #fce8e1;
+    color: var(--accent-dark);
+}
+
+/* Judul degree */
+.edu-timeline__degree {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+    line-height: 1.3;
+}
+
+/* Nama institusi */
+.edu-timeline__institution {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+/* Chip IPK */
+.edu-timeline__gpa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: #f3ede2;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.82rem;
+}
+
+.edu-timeline__gpa-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+}
+
+.edu-timeline__gpa-value {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .edu-timeline__item {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "year"
+            "card";
+    }
+
+    /* Sembunyikan konektor di mobile, ganti dengan border kiri pada card */
+    .edu-timeline__connector {
+        display: none;
+    }
+
+    .edu-timeline__year {
+        align-items: flex-start;
+        text-align: left;
+        padding-top: 0;
+        padding-bottom: 0.35rem;
+    }
+
+    .edu-timeline__card {
+        border-left: 3px solid var(--accent);
+    }
 }

@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - {{ name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_main' %}#skills">Skills</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="education-section" id="education">
+            <div class="container">
+                <p class="section-kicker">Latar belakang akademis saya</p>
+                <h1>Education</h1>
+
+                <!-- ======================================================
+                     Timeline Education
+                     ====================================================== -->
+                <div class="edu-timeline">
+                    {% for edu in education_list %}
+                    <div class="edu-timeline__item">
+                        <!-- Tahun di kolom kiri -->
+                        <div class="edu-timeline__year">
+                            <span class="edu-timeline__year-start">{{ edu.started_at|date:"Y" }}</span>
+                            <span class="edu-timeline__year-sep">&ndash;</span>
+                            {% if edu.is_current %}
+                            <span class="edu-timeline__year-end edu-timeline__year-end--current">Sekarang</span>
+                            {% else %}
+                            <span class="edu-timeline__year-end">{{ edu.ended_at|date:"Y" }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Bullet -->
+                        <div class="edu-timeline__connector">
+                            <div class="edu-timeline__dot"></div>
+                            <div class="edu-timeline__line"></div>
+                        </div>
+
+                        <!-- Card content -->
+                        <article class="edu-timeline__card">
+                            <div class="edu-timeline__card-header">
+                                {% if edu.is_current %}
+                                <span class="edu-timeline__badge edu-timeline__badge--active">Sedang Berjalan</span>
+                                {% else %}
+                                <span class="edu-timeline__badge">Lulus</span>
+                                {% endif %}
+                            </div>
+                            <h2 class="edu-timeline__degree">{{ edu.degree }}</h2>
+                            <p class="edu-timeline__institution">{{ edu.institution }}</p>
+                            {% if edu.gpa %}
+                            <div class="edu-timeline__gpa">
+                                <span class="edu-timeline__gpa-label">IPK</span>
+                                <span class="edu-timeline__gpa-value">{{ edu.gpa }}</span>
+                            </div>
+                            {% endif %}
+                        </article>
+                    </div>
+                    {% empty %}
+                    <p class="empty-state">Belum ada riwayat pendidikan yang ditambahkan.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

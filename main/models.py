@@ -34,3 +34,19 @@ class Mahasiswa(models.Model):
 
     def __str__(self):
         return self.nama
+
+
+class Education(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.CharField(max_length=255)
+    degree = models.CharField(max_length=255)
+    gpa = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    started_at = models.DateField()
+    ended_at = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.degree} - {self.institution}"
+
+    @property
+    def is_current(self):
+        return self.ended_at is None
