@@ -60,11 +60,20 @@ class MainTest(TestCase):
 
 class EducationTest(TestCase):
     def setUp(self):
+        # Skenario 1: Berjalan & ada IPK (Data Anda)
         self.education = Education.objects.create(
             institution="Universitas Indonesia",
             degree="S1 Ilmu Komputer",
             gpa="4.00",
             started_at="2024-08-01",
+        )
+        # Skenario 2: Lulus & tanpa IPK
+        self.education_completed = Education.objects.create(
+            institution="SMAN 1 Surakarta",
+            degree="SMA",
+            gpa=None,
+            started_at="2021-07-01",
+            ended_at="2024-05-01",
         )
 
     def test_education_url_is_accessible(self):
@@ -90,3 +99,18 @@ class EducationTest(TestCase):
         response = self.client.get(reverse("main:show_main"))
 
         self.assertContains(response, f'href="{reverse("main:show_education")}"')
+
+    def test_education_model_properties(self):
+        self.assertEqual(str(self.education), "S1 Ilmu Komputer - Universitas Indonesia")
+        self.assertTrue(self.education.is_current)
+        self.assertFalse(self.education_completed.is_current)
+
+    def test_completed_education_data_in_response(self):
+        response = self.client.get(reverse("main:show_education"))
+        
+        # Memastikan skenario lulus dirender dengan benar
+        self.assertContains(response, self.education_completed.institution)
+        self.assertContains(response, "Lulus")
+        
+        # Memastikan blok IPK tidak muncul (atau tidak me-render teks 'None')
+        self.assertNotContains(response, '<span class="edu-timeline__gpa-value">None</span>')
