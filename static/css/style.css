@@ -74,144 +74,388 @@ h1,
 
 
 /* ============================================================
-   Section Hero dengan CSS Grid
+   Section: Hero (Cyber Tech Modern Dark Edition)
+   Inspired by modern dark mode software engineer portfolios
    ============================================================ */
-.hero {
-    padding: 4.5rem 0 5rem;
+:root {
+    --cyber-bg: #070a0e;
+    --cyber-card: #0e131a;
+    --cyber-neon: #00e575;
+    --cyber-neon-hover: #15f084;
+    --cyber-border: rgba(255, 255, 255, 0.08);
+    --cyber-border-active: rgba(0, 229, 117, 0.35);
+    --cyber-text-title: #ffffff;
+    --cyber-text-body: #94a3b8;
+    --cyber-font-heading: "Plus Jakarta Sans", "Space Grotesk", sans-serif;
 }
 
-.hero-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-areas:
-        "identity photo"
-        "details  photo";
-    gap: 1.5rem 3rem;
+/* Site Header Dark Mode Adaptations */
+.site-header {
+    background-color: rgba(7, 10, 14, 0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--cyber-border);
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    transition: background-color 0.3s ease;
 }
 
-.hero-identity {
-    grid-area: identity;
-}
-
-.hero-details {
-    grid-area: details;
-}
-
-.hero-kicker {
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-dark);
+.site-header .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--cyber-text-title);
+    text-decoration: none;
     font-weight: 700;
-    margin-bottom: 0.75rem;
 }
 
-.hero-identity h1 {
-    font-size: clamp(3rem, 7vw, 5rem);
-    line-height: 0.95;
-}
-
-.bio {
-    color: var(--text-muted);
-    max-width: 480px;
-    margin-bottom: 1.5rem;
-}
-
-.meta-list {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-}
-
-.meta-row dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 0.15rem;
-}
-
-.meta-row dd {
+.site-header nav a {
+    color: var(--cyber-text-body);
+    text-decoration: none;
+    font-size: 0.92rem;
     font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-.social-links {
+.site-header nav a:hover {
+    color: var(--cyber-neon);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Cyber Hero Wrapper ── */
+.cyber-hero {
+    background-color: var(--cyber-bg);
+    color: var(--cyber-text-title);
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 0 6rem;
+    min-height: calc(100vh - 70px);
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+}
+
+/* Ambient Radial Glows */
+.cyber-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(90px);
+}
+
+.cyber-glow--primary {
+    top: 15%;
+    right: 15%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(0, 229, 117, 0.16) 0%, rgba(0, 229, 117, 0) 70%);
+}
+
+.cyber-glow--secondary {
+    bottom: 10%;
+    left: 10%;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+/* ── Hero Container & Grid ── */
+.cyber-hero-container {
+    display: grid;
+    grid-template-columns: 1.15fr 0.95fr;
+    align-items: center;
+    gap: 3.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Left Column: Content ── */
+.cyber-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Title & Name */
+.cyber-hero-title {
+    font-family: var(--cyber-font-heading);
+    font-size: clamp(2.8rem, 5.5vw, 4.4rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin: 0 0 1.25rem 0;
+}
+
+/* Bio Text */
+.cyber-hero-bio {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--cyber-text-body);
+    max-width: 520px;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Meta Pills (NPM & Program) */
+.cyber-meta-pills {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.cyber-meta-pill {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--cyber-border);
+    border-radius: 8px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+}
+
+.cyber-meta-pill strong {
+    color: var(--cyber-neon);
+    margin-right: 0.3rem;
+}
+
+/* CTA Buttons */
+.cyber-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
-.social-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 600;
+.cyber-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-radius: 999px;
+    font-family: var(--cyber-font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
     text-decoration: none;
-    color: var(--paper);
-    background-color: var(--ink);
-    border-radius: var(--radius);
-    padding: 0.5rem 1.1rem;
-    transition: background-color 0.2s ease;
+    padding: 0.8rem 1.6rem;
+    cursor: pointer;
+    transition: all 0.22s ease;
 }
 
-.social-link:hover {
-    background-color: var(--accent);
+.cyber-btn--primary {
+    background-color: var(--cyber-neon);
+    color: #070a0e;
+    box-shadow: 0 0 25px rgba(0, 229, 117, 0.35);
+    border: 1.5px solid var(--cyber-neon);
 }
 
-.hero-photo {
-    grid-area: photo;
-    align-self: center;
+.cyber-btn--primary:hover {
+    background-color: var(--cyber-neon-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(0, 229, 117, 0.55);
+}
+
+.cyber-btn--glass {
+    background-color: rgba(14, 19, 26, 0.7);
+    color: #ffffff;
+    border: 1.5px solid var(--cyber-border-active);
+    backdrop-filter: blur(10px);
+}
+
+.cyber-btn--glass:hover {
+    border-color: var(--cyber-neon);
+    color: var(--cyber-neon);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0, 229, 117, 0.2);
+}
+
+/* ── Right Column: Visual Centerpiece ── */
+.cyber-hero-visual {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 480px;
 }
 
-.photo-block {
+/* Tilted Diamond Geometric Accent */
+.cyber-tech-diamond {
     position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
+    width: 390px;
+    height: 390px;
+    border: 1.5px solid rgba(0, 229, 117, 0.35);
+    border-radius: 36px;
+    transform: rotate(45deg);
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: inset 0 0 35px rgba(0, 229, 117, 0.08);
+    animation: gentlePulseDiamond 6s ease-in-out infinite alternate;
+}
+
+@keyframes gentlePulseDiamond {
+    0% {
+        transform: rotate(45deg) scale(1);
+        border-color: rgba(0, 229, 117, 0.25);
+    }
+
+    100% {
+        transform: rotate(45deg) scale(1.03);
+        border-color: rgba(0, 229, 117, 0.5);
+    }
+}
+
+.diamond-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--cyber-neon);
+    box-shadow: 0 0 10px var(--cyber-neon);
+}
+
+.diamond-dot--top {
+    top: -5px;
+    left: calc(50% - 5px);
+}
+
+.diamond-dot--bottom {
+    bottom: -5px;
+    left: calc(50% - 5px);
+}
+
+.diamond-dot--left {
+    left: -5px;
+    top: calc(50% - 5px);
+}
+
+.diamond-dot--right {
+    right: -5px;
+    top: calc(50% - 5px);
+}
+
+/* Center Framed Portrait Card (Enlarged) */
+.cyber-portrait-card {
+    position: relative;
+    z-index: 2;
+    width: 330px;
+    height: 410px;
+    border-radius: 22px;
+    overflow: hidden;
+    background-color: var(--cyber-card);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(0, 229, 117, 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cyber-portrait-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 70px rgba(0, 229, 117, 0.22);
+}
+
+.cyber-portrait-img {
     width: 100%;
     height: 100%;
-    background-color: var(--accent);
-    border-radius: var(--radius);
-    z-index: 0;
+    object-fit: cover;
+    object-position: center top;
 }
 
-.avatar {
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 3px solid var(--ink);
+/* ── Floating Bottom Island Dock ── */
+.cyber-floating-dock {
+    position: fixed;
+    bottom: 1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    background: rgba(14, 19, 26, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    border-radius: 999px;
+    padding: 0.4rem 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 229, 117, 0.1);
+}
+
+.dock-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--cyber-text-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.dock-item:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dock-item--active {
+    background-color: var(--cyber-neon);
+    color: #070a0e;
+    font-weight: 700;
+    box-shadow: 0 0 16px rgba(0, 229, 117, 0.4);
+}
+
+.dock-item--active:hover {
+    background-color: var(--cyber-neon-hover);
+    color: #070a0e;
+}
+
+.dock-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* ── Responsive Styling ── */
+@media (max-width: 960px) {
+    .cyber-hero-container {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+        text-align: center;
+    }
+
+    .cyber-hero-content {
+        align-items: center;
+    }
+
+    .cyber-cta-group {
+        justify-content: center;
+    }
+
+    .cyber-meta-pills {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .cyber-floating-dock .dock-label {
+        display: none;
+    }
+
+    .cyber-floating-dock {
+        padding: 0.35rem 0.5rem;
+    }
+
+    .dock-item {
+        padding: 0.5rem 0.65rem;
+    }
 }
 
 
 /* ============================================================
-   Footer & Responsive
+   Footer
    ============================================================ */
 .site-footer {
     padding: 1.5rem;
     color: var(--text-muted);
     font-size: 0.85rem;
     border-top: 1px solid var(--line);
-}
-
-@media (max-width: 600px) {
-    .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
-    }
-
-    .hero-photo {
-        max-width: 220px;
-    }
-
-    .social-links {
-        justify-content: flex-start;
-    }
 }
 
 
@@ -363,13 +607,7 @@ h1,
 }
 
 
-.mahasiswa-empty {
-    text-align: center;
-    color: var(--text-muted);
-    font-style: italic;
-    grid-column: 1 / -1;
-    padding: 2rem 0;
-}
+
 
 
 /* ============================================================
@@ -500,14 +738,7 @@ h1,
     transform: scale(1.3);
 }
 
-.edu-timeline__line {
-    display: none;
-}
 
-/* Baris terakhir: sembunyikan garis bawah */
-.edu-timeline__item:last-child .edu-timeline__line {
-    background-color: transparent;
-}
 
 /* ── Kolom kanan: card konten ── */
 .edu-timeline__card {
