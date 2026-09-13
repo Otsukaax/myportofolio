@@ -75,7 +75,7 @@ h1,
 
 /* ============================================================
    Section: Hero (Cyber Tech Modern Dark Edition)
-   Inspired by modern dark mode software engineer portfolios
+   Inspired from: https://www.wallofportfolios.in/portfolios/trushank-mistry/
    ============================================================ */
 :root {
     --cyber-bg: #070a0e;
@@ -605,9 +605,6 @@ h1,
         height: 180px;
     }
 }
-
-
-
 
 
 /* ============================================================
