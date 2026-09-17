@@ -1,6 +1,6 @@
-from django.forms import DateInput, ModelForm, NumberInput, TextInput
+from django.forms import DateInput, ModelForm, NumberInput, Select, TextInput, Textarea, URLInput
 
-from main.models import Education
+from main.models import Education, Experience
 
 
 class EducationForm(ModelForm):
@@ -46,6 +46,52 @@ class EducationForm(ModelForm):
             "started_at": DateInput(
                 attrs={
                     "type": "date",
+                }
+            ),
+            "ended_at": DateInput(
+                attrs={
+                    "type": "date",
+                }
+            ),
+        }
+
+
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "ended_at",
+        ]
+
+        labels = {
+            "title": "Posisi / Pekerjaan",
+            "description": "Deskripsi Pengalaman",
+            "category": "Kategori",
+            "thumbnail": "URL Thumbnail (Opsional)",
+            "ended_at": "Tanggal Selesai (Opsional)",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Software Engineer Intern",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Mengerjakan fitur X...",
+                    "rows": 4,
+                }
+            ),
+            "category": Select(),
+            "thumbnail": URLInput(
+                attrs={
+                    "placeholder": "https://example.com/image.png",
                 }
             ),
             "ended_at": DateInput(
