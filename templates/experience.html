@@ -20,6 +20,18 @@
                     </a>
                 </div>
 
+                <form method="get"
+                      action="{% url 'main:show_experience' %}"
+                      class="education-search">
+                    <input type="search"
+                           name="title"
+                           value="{{ title_query }}"
+                           placeholder="Cari berdasarkan nama pengalaman"
+                           class="education-search__input"
+                           aria-label="Cari berdasarkan nama pengalaman">
+                    <button type="submit" class="button">Cari</button>
+                </form>
+
                 <div class="experience-grid">
                     {% for experience in experience_list %}
                     <article class="experience-card">
@@ -45,9 +57,11 @@
                         </div>
                     </article>
                     {% empty %}
-                    <p class="empty-state">
-                        Belum ada pengalaman yang ditambahkan.
-                    </p>
+                    {% if title_query %}
+                        <p class="empty-state">Tidak ada pengalaman dengan nama tersebut.</p>
+                    {% else %}
+                        <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

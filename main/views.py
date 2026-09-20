@@ -22,7 +22,12 @@ def show_main(request):
 
 
 def get_experience_json(request):
+    title_query = request.GET.get("title", "").strip()
     experience_list = Experience.objects.all()
+
+    if title_query:
+        experience_list = experience_list.filter(title__icontains=title_query)
+
     experience_json = serializers.serialize("json", experience_list)
     return HttpResponse(experience_json, content_type="application/json")
 
@@ -35,10 +40,12 @@ def show_experience(request):
         json_response.content.decode("utf-8"),
     )
     experience_list = [exp_entry.object for exp_entry in deserialized_experiences]
+    title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Azka Nur Jauhar",
         "experience_list": experience_list,
+        "title_query": title_query,
     }
     return render(request, "experience.html", context)
 
