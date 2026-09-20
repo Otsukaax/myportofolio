@@ -42,6 +42,33 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
 ---
 
+### Tugas 3
+
+1. **Jelaskan mengapa kita menggunakan `ModelForm` pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan `{% csrf_token %}` pada form tersebut!**
+
+   Kita menggunakan `ModelForm` karena lebih praktis dan efisien. Kita tidak perlu menulis setiap elemen dalam `<form>` di HTML. Django akan otomatis membaca atribut dari model yang sudah ada dan membuatkan form yang sesuai, lengkap dengan sistem validasinya (seperti tipe data, batasan panjang teks, required, dll). Hal ini membuat kode lebih bersih, meminimalisasi human error, dan sangat mudah di-maintain jika sewaktu-waktu modelnya berubah.
+   
+   Sementara itu, `{% csrf_token %}` wajib ditambahkan demi keamanan untuk mencegah serangan *Cross-Site Request Forgery* (CSRF). Token rahasia ini memastikan bahwa *request* berupa modifikasi data (seperti POST, PUT, DELETE) benar-benar berasal dari website kita sendiri, bukan dari website lain yang mencoba membajak sesi pengguna.
+
+2. **Pada Tutorial 03, kita membahas format data JSON dan XML. Mengapa JSON lebih disukai dalam pengembangan aplikasi web modern dibandingkan XML?**
+
+   JSON lebih disukai karena strukturnya jauh lebih sederhana, ringan, dan ringkas. Tidak seperti XML, format JSON menggunakan *key-value* (*dictionary*). Karena ukurannya yang lebih kecil, proses transfer data juga menjadi lebih cepat.
+
+3. **Jelaskan alur yang terjadi saat kamu menggunakan fungsi *view* untuk mengembalikan data portofoliomu dalam bentuk JSON. Mengapa kita perlu melakukan proses *serialization* pada model Django sebelum datanya dikirim?**
+
+   **Alur:** Di portofolioku, misalkan ketika URL `/experience/json/` diakses, `urls.py` akan memanggil fungsi view `get_experience_json`. Di dalam fungsi tersebut, data dari database diambil menggunakan `Experience.objects.all()`. Kemudian, data-data tersebut dikonversi menjadi format JSON dengan menggunakan `serializers.serialize("json", experience_list)`. Data JSON tersebut baru dikirim kembali lewat `HttpResponse` dengan *content-type* `"application/json"`.
+
+   **Alasan *serialization*:** Objek yang diambil dari database (seperti objek model `Experience` dan `Education`) bentuk aslinya adalah *Python Objects*. Format objek Python ini tidak bisa langsung dikirim begitu saja melalui protokol HTTP untuk dibaca oleh browser. Jadi, kita perlu menggunakan *serialization* untuk menerjemahkan objek Python tersebut menjadi format yang universal, seperti JSON.
+
+## AI Disclosure Week 3
+
+Dalam pengerjaan Tugas Individu 3 kali ini, saya mengerjakan instruksi yang diberikan secara bertahap (per poin) dengan bantuan AI Gemini 3.1 Pro. Saya melakukan penambahan fitur CRUD (*Create, Read, Update, Delete*) pada aplikasi `main` dan menyelesaikan beberapa *checklist* tugas dengan bantuan AI.
+
+* **Ringkasan Percakapan dengan AI**: https://share.gemini.google/U0ftq0XJbHay
+* **Strategi Prompting**: Pada tugas kali ini, saya menerapkan pendekatan *step-by-step prompting* yang sangat terstruktur. Saya memecah instruksi dari tutorial satu per satu ke AI. Setelah AI memberikan solusi untuk satu poin, saya mengimplementasikannya ke kode saya, menyesuaikan sesuai kebutuhan dan mengoreksi kode yang kurang sesuai, melakukan *cross-check*, dan baru melangkah ke poin instruksi selanjutnya.
+
+---
+
 ### Tugas 2
 
 1. **Jelaskan alur yang terjadi ketika pengguna membuka halaman portofolio baru, mulai dari permintaan yang diterima proyek hingga data ditampilkan pada browser. Dalam jawabanmu, jelaskan peran `urls.py` proyek, `urls.py` aplikasi, `view`, `model`, dan `template`.**
