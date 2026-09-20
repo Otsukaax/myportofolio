@@ -57,6 +57,52 @@ class MainTest(TestCase):
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
 
+    def test_create_experience(self):
+        response = self.client.post(
+            reverse("main:create_experience"),
+            {
+                "title": "Software Engineer Intern",
+                "description": "Bikin fitur baru.",
+                "category": "Internship",
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Experience.objects.filter(title="Software Engineer Intern").exists())
+
+    def test_update_experience(self):
+        response = self.client.post(
+            reverse("main:update_experience", args=[self.experience.id]),
+            {
+                "title": "Asisten Dosen PBP (Updated)",
+                "description": self.experience.description,
+                "category": self.experience.category,
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Asisten Dosen PBP (Updated)")
+
+    def test_delete_experience(self):
+        response = self.client.post(
+            reverse("main:delete_experience", args=[self.experience.id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Experience.objects.count(), 0)
+
+    def test_get_experience_json(self):
+        response = self.client.get(reverse("main:get_experience_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Asisten Dosen PBP")
+
+    def test_search_experience_json(self):
+        Experience.objects.create(title="Data Scientist", description="AI", category="full-time")
+        response = self.client.get(reverse("main:get_experience_json") + "?title=Asisten")
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Asisten Dosen PBP")
+        self.assertNotContains(response, "Data Scientist")
+
+
 
 class EducationTest(TestCase):
     def setUp(self):
