@@ -1,27 +1,58 @@
 {% extends "base.html" %}
 {% block meta %}
-    <title>{% if is_update %}Update{% else %}Add{% endif %} Experience - {{ name }}</title>
+<title>{% if is_update %}Update{% else %}Add{% endif %} Experience - {{ name }}</title>
 {% endblock meta %}
 {% block content %}
-    <main>
-        <section class="experience-section">
-            <div class="container">
-                <h1>{% if is_update %}Update{% else %}Add New{% endif %} Experience</h1>
-                <form method="post" class="education-form">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% for error in field.errors %}
-                                <p class="form-error">{{ error }}</p>
-                            {% endfor %}
-                        </div>
+<main>
+    <section class="experience-section">
+        <div class="container">
+            <h1>{% if is_update %}Update{% else %}Add New{% endif %} Experience</h1>
+            <form method="post" class="education-form">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name == 'description' %}
+                    <div class="textarea-wrapper">
+                        {{ field }}
+                        <span id="char-counter" class="char-counter">0 / 500</span>
+                    </div>
+                    {% else %}
+                    {{ field }}
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                    <p class="form-error">{{ error }}</p>
                     {% endfor %}
-                    <button type="submit" class="button">{% if is_update %}Simpan Perubahan{% else %}Tambah Experience{% endif %}</button>
-                    <a href="{% url 'main:show_experience' %}" class="button button-secondary">Batal</a>
-                </form>
-            </div>
-        </section>
-    </main>
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="button">
+                    {% if is_update %}Simpan Perubahan{% else %}Tambah Experience{% endif %}
+                </button>
+                <a href="{% url 'main:show_experience' %}" class="button button-secondary">Batal</a>
+            </form>
+        </div>
+    </section>
+</main>
+
+<script>
+    const descInput = document.getElementById('id_description');
+    const charCounter = document.getElementById('char-counter');
+
+    if (descInput && charCounter) {
+        charCounter.textContent = `${descInput.value.length} / 500`;
+
+        descInput.addEventListener('input', function () {
+            const currentLength = this.value.length;
+            charCounter.textContent = `${currentLength} / 500`;
+
+            if (currentLength >= 500) {
+                charCounter.style.color = '#ef4444';
+            } else {
+                charCounter.style.color = '#6b7280';
+            }
+        });
+    }
+</script>
 {% endblock content %}

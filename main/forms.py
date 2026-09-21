@@ -86,6 +86,8 @@ class ExperienceForm(ModelForm):
                 attrs={
                     "placeholder": "Mengerjakan fitur X...",
                     "rows": 4,
+                    "maxlength": "500",
+                    "id": "id_description",
                 }
             ),
             "category": Select(),
