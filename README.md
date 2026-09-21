@@ -48,7 +48,7 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 - **Implementasi CRUD pada Experience:** Menambahkan fitur *Create, Read, Update,* dan *Delete* untuk model `Experience`.
 - **Penambahan Fitur Pencarian:** Menambahkan fitur filter/pencarian (*search filter*) pada halaman `Experience`.
 - **Pembuatan Unit Test:** Menambahkan *CRUD test* untuk fitur `Experience` demi memastikan fungsi berjalan dengan baik.
-- **Penambahan _Character Counter_ pada deskripsi:** Menambahkan _character counter_ pada _form_ add _experience_.
+- **Penambahan _Character Counter_ pada _experience form_:** Menambahkan _character counter_ pada _form_ add _experience_.
 
 ---
 
