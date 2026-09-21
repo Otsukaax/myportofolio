@@ -42,6 +42,15 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
 ---
 
+## Progress Mingguan Week 3
+
+- **Penyelesaian Tutorial 3:** Mengikuti alur dan instruksi dari Tutorial 3.
+- **Implementasi CRUD pada Experience:** Menambahkan fitur *Create, Read, Update,* dan *Delete* untuk model `Experience`.
+- **Penambahan Fitur Pencarian:** Menambahkan fitur filter/pencarian (*search filter*) pada halaman `Experience`.
+- **Pembuatan Unit Test:** Menambahkan *CRUD test* untuk fitur `Experience` demi memastikan fungsi berjalan dengan baik.
+
+---
+
 ### Tugas 3
 
 1. **Jelaskan mengapa kita menggunakan `ModelForm` pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan `{% csrf_token %}` pada form tersebut!**
