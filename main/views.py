@@ -50,10 +50,13 @@ def show_experience(request):
     experience_list = [exp_entry.object for exp_entry in deserialized_experiences]
     title_query = request.GET.get("title", "").strip()
 
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+
     context = {
         "name": "Azka Nur Jauhar",
         "experience_list": experience_list,
         "title_query": title_query,
+        "is_editor": is_editor,
     }
     return render(request, "experience.html", context)
 
@@ -78,7 +81,7 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def update_experience(request, experience_id):
-    if not request.user.is_superuser:
+    if not (request.user.is_superuser or request.user.groups.filter(name='Editor').exists()):
         raise PermissionDenied
     experience_item = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience_item)
@@ -132,10 +135,13 @@ def show_education(request):
     education_list.sort(key=lambda education_entry: education_entry.started_at, reverse=True)
     institution_query = request.GET.get("institution", "").strip()
 
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+
     context = {
         "name": "Azka Nur Jauhar",
         "education_list": education_list,
         "institution_query": institution_query,
+        "is_editor": is_editor,
     }
     return render(request, "education.html", context)
 
