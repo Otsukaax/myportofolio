@@ -30,6 +30,12 @@
                         <span class="cyber-meta-pill"><strong>Program:</strong> {{ study_program }}</span>
                     </div>
 
+                    {% if user.is_authenticated %}
+                    <div class="cyber-meta-pills" style="margin-top: -1.25rem;">
+                        <span class="cyber-meta-pill"><strong>Terakhir Login:</strong> {{ last_login }}</span>
+                    </div>
+                    {% endif %}
+
                     <!-- Call To Action Buttons -->
                     <div class="cyber-cta-group">
                         <a href="mailto:azka.nur@cs.ui.ac.id?subject=Inquiry%20from%20Portfolio"

@@ -13,11 +13,13 @@
                 <p class="section-kicker">Latar belakang akademis saya</p>
                 <div class="education-header">
                     <h1>Education</h1>
+                    {% if user.is_superuser %}
                     <a href="{% url 'main:create_education' %}"
                        class="button education-add-button">
                         <span aria-hidden="true">+</span>
                         Tambah Riwayat Pendidikan
                     </a>
+                    {% endif %}
                 </div>
                 <form method="get"
                       action="{% url 'main:show_education' %}"
@@ -70,11 +72,18 @@
                                 <span class="edu-timeline__gpa-value">{{ edu.gpa }}</span>
                             </div>
                             {% endif %}
+
+                            <div style="margin-top: 1rem;">
+                                {% include "components/education_star.html" with edu=edu %}
+                            </div>
+
+                            {% if user.is_superuser %}
                             <div class="education-card-actions">
                                 <div class="education-actions">
                                     {% include "components/education_delete_modal.html" with education=edu %}
                                 </div>
                             </div>
+                            {% endif %}
                         </article>
                     </div>
                     {% empty %}
