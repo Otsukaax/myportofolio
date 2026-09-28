@@ -42,6 +42,23 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
 ---
 
+## Progress Mingguan Week 4
+
+- **Penyelesaian Tutorial 4**
+- **Implementasi Autentikasi dan Cookies:** Menambahkan fitur Register, Login, Logout serta menampilkan waktu terakhir login (`last_login`) pengguna menggunakan cookies.
+- **Penambahan Relasi ManyToMany (Fitur Star):** Menambahkan field `starred_by` pada model `Experience` dan `Education` agar pengguna terdaftar dapat memberi interaksi bintang.
+- **Implementasi Role-based Access Control:** Membatasi fitur manipulasi data sesuai peran pengguna (Guest, User, Editor, dan Superuser). Superuser memiliki hak penuh (CRUD), Editor hanya dapat melakukan fungsi pembaruan data (Update), pengguna biasa dapat memberi interaksi bintang, dan pengunjung (*guest*) hanya dapat membaca data.
+
+## AI Disclosure Week 4
+
+Dalam pengerjaan *Individual Assignment* 4 kali ini, saya mematuhi instruksi modul dan menambahkan logika otorisasi tingkat lanjut (termasuk implementasi peran Editor) menggunakan bantuan asisten AI (Google Antigravity IDE / Gemini 3.1 Pro).
+
+* **Strategi Prompting**: Saya menggunakan pendekatan *context-based prompting* dengan memberikan narasi kondisi awal model proyek saya (`Experience` dan `Education`) serta melampirkan *screenshot* panduan soal tugas. Kami berdiskusi layaknya *pair-programming* untuk menerjemahkan instruksi pada modul (yang tadinya memakai contoh model generik `Project`) agar bisa diadaptasi secara langsung ke dalam struktur spesifik portofolio saya.
+* **Bagian yang Dibantu AI**: AI sangat membantu pada tahap merumuskan *server-side validation* untuk memverifikasi keanggotaan pengguna di grup `Editor` (`request.user.groups.filter(name='Editor').exists()`), menerapkan logika *conditional rendering* pada UI template untuk menampilkan/menyembunyikan tombol sesuai hak akses, serta merancang fungsionalitas komponen tombol SVG berwarna *cyber-neon* untuk fitur interaktif *Star*.
+* **Refleksi Penggunaan AI**: AI sangat membantu memecah belah kebingungan saya mengenai logika sistem autentikasi bawaan Django. Namun, instruksi awal dari AI sering kali masih berupa template umum (seperti menggunakan teks dasar untuk *button*), sehingga saya secara kritis harus mengarahkan AI untuk memoles komponen UI-nya agar selaras dengan estetika *modern* dari *website* saya dan memastikan kode *backend*-nya tetap aman dari kebocoran data (misalnya dengan menggunakan *natural foreign keys*).
+
+---
+
 ## Progress Mingguan Week 3
 
 - **Penyelesaian Tutorial 3:** Mengikuti alur dan instruksi dari Tutorial 3.
