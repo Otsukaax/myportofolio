@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -7,6 +8,7 @@ from main.models import Education, Experience
 
 class MainTest(TestCase):
     def setUp(self):
+        self.user = User.objects.create_superuser(username="admin", password="password123")
         self.experience = Experience.objects.create(
             title="Asisten Dosen PBP",
             description="Membantu mahasiswa memahami pengembangan web.",
@@ -36,26 +38,26 @@ class MainTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertContains(response, 'id="experience-search-form"')
+        self.assertContains(response, 'id="grid"')
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
 
     def test_empty_experience_page(self):
         Experience.objects.all().delete()
         response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience.html")
+        self.assertContains(response, 'id="empty"')
 
     def test_completed_experience(self):
         self.experience.ended_at = timezone.now()
         self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
+        response = self.client.get(reverse("main:get_experience_json"))
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"is_ongoing": false')
 
     def test_get_experience_json(self):
         response = self.client.get(reverse("main:get_experience_json"))
@@ -69,6 +71,43 @@ class MainTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Asisten Dosen PBP")
         self.assertNotContains(response, "Data Scientist")
+
+    def test_create_experience_ajax_success(self):
+        self.client.login(username="admin", password="password123")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "Software Engineer Intern",
+                "description": "Bikin fitur baru.",
+                "category": "Internship",
+            }
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Experience.objects.filter(title="Software Engineer Intern").exists())
+
+    def test_create_experience_ajax_forbidden(self):
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "Software Engineer Intern",
+                "description": "Bikin fitur baru.",
+                "category": "Internship",
+            }
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_clean_title_xss_rejected(self):
+        self.client.login(username="admin", password="password123")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": '<img src="x" onerror="alert(1)">',
+                "description": "Coba injeksi XSS",
+                "category": "Internship",
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Experience.objects.filter(description="Coba injeksi XSS").exists())
 
 
 

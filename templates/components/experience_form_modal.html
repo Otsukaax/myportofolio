@@ -1,0 +1,49 @@
+<div id="add-experience-modal"
+     class="experience-form-modal project-form-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="add-experience-modal-title">
+    <button type="button"
+            class="experience-form-modal__backdrop project-form-modal__backdrop"
+            popovertarget="add-experience-modal"
+            popovertargetaction="hide"
+            aria-label="Tutup form tambah pengalaman"></button>
+    <div class="experience-form-modal__content project-form-modal__content">
+        <button type="button"
+                class="experience-form-modal__close project-form-modal__close"
+                popovertarget="add-experience-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form tambah pengalaman">×</button>
+        <h2 id="add-experience-modal-title">Tambah Pengalaman Baru</h2>
+        <form id="experience-form"
+              method="post"
+              action="{% url 'main:create_experience' %}"
+              class="education-form project-form">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.name == 'description' %}
+                <div class="textarea-wrapper">
+                    {{ field }}
+                    <span id="char-counter" class="char-counter">0 / 500</span>
+                </div>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% for error in field.errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <div class="experience-form-modal__actions project-form-modal__actions">
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="add-experience-modal"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Tambah Pengalaman</button>
+            </div>
+        </form>
+    </div>
+</div>
