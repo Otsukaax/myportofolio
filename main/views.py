@@ -144,33 +144,49 @@ def delete_experience(request, experience_id):
 
 def get_education_json(request):
     search_query = request.GET.get("institution", "").strip()
-    education_list = Education.objects.all()
 
+    # Menggunakan prefetch_related agar hemat query database
+    educations = Education.objects.prefetch_related('starred_by').all()
     if search_query:
-        education_list = education_list.filter(institution__icontains=search_query)
+        educations = educations.filter(institution__icontains=search_query)
 
-    education_json = serializers.serialize("json", education_list, use_natural_foreign_keys=True)
-    return HttpResponse(education_json, content_type="application/json")
+    # Urutkan berdasarkan waktu mulai terbaru
+    educations = educations.order_by('-started_at')
+
+    # Konstruksi data JSON secara manual agar bisa menyisipkan logika Star
+    data = []
+    for edu in educations:
+        starred_users = edu.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(edu.id),
+            "fields": {
+                "institution": edu.institution,
+                "degree": edu.degree,
+                "gpa": str(edu.gpa) if edu.gpa is not None else None,
+                "started_at": str(edu.started_at),
+                "ended_at": str(edu.ended_at) if edu.ended_at else None,
+                "is_current": edu.is_current,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    deserialized_educations = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    education_list = [education_entry.object for education_entry in deserialized_educations]
-    education_list.sort(key=lambda education_entry: education_entry.started_at, reverse=True)
     institution_query = request.GET.get("institution", "").strip()
-
     is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
 
     context = {
         "name": "Azka Nur Jauhar",
-        "education_list": education_list,
         "institution_query": institution_query,
         "is_editor": is_editor,
+        "form": EducationForm(),
     }
     return render(request, "education.html", context)
 
@@ -191,6 +207,23 @@ def create_education(request):
         "form": form,
     }
     return render(request, "education_form.html", context)
+
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan riwayat pendidikan."},
+            status=403,
+        )
+    form = EducationForm(request.POST)
+    if form.is_valid():
+        education_entry = form.save()
+        return JsonResponse(
+            {"message": "Riwayat pendidikan berhasil ditambahkan!", "pk": str(education_entry.id)},
+            status=201,
+        )
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 @login_required(login_url="/login/")

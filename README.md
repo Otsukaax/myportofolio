@@ -42,6 +42,56 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
 ---
 
+## Progress Mingguan Week 5
+
+- **Penyelesaian Tutorial 5**
+- **Implementasi AJAX Read pada Education:** Mengubah halaman `Education` agar hanya memuat kerangka dasar (skeleton), lalu mengambil dan merender data riwayat pendidikan secara asinkronus dari endpoint JSON via `fetch()`.
+- **Implementasi Fitur Pencarian Real-Time dengan Debouncing:** Menerapkan fungsi pencarian nama institusi dengan *debounce delay* sebesar 300ms tanpa perlu me-*reload* halaman browser.
+- **Implementasi Modal Form Berbasis HTML5 Popover API:** Membuat form penambahan riwayat pendidikan menggunakan Popover API bawaan (`popover="auto"` dan `popovertarget`) tanpa dependensi pustaka eksternal.
+- **Implementasi AJAX Create dengan Toast Feedback:** Mengirim data form via Fetch API method `POST` dengan proteksi `X-CSRFToken`, menutup modal otomatis, menampilkan notifikasi toast (sukses/gagal), dan me-*refresh* daftar timeline seketika.
+- **Pertahanan XSS Berlapis:** Menerapkan *client-side escaping* (`escapeHtml()`) dan *server-side sanitization* (`strip_tags()` dan `ValidationError`) pada method `clean_institution` dan `clean_degree` di `EducationForm`.
+- **Pembuatan dan Penyesuaian Unit Tests:** Menyesuaikan kelas `EducationTest` di `tests.py` untuk menguji kerangka AJAX, endpoint JSON, fitur search, otorisasi RBAC, dan sanitasi XSS (22 unit tests lulus 100%).
+
+---
+
+### Tugas 5
+
+1. **Jelaskan apa itu debouncing dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!**
+
+   Pengertian: *Debouncing* adalah teknik yang menunda eksekusi suatu fungsi sampai beberapa waktu tertentu dari terakhir kali fungsi/event tersebut dipicu. Contoh mekanisme ini diterapkan dalam fitur pencarian dengan memanfaatkan *timer* (`setTimeout`) dan membatalkan *timer* sebelumnya (`clearTimeout`) setiap kali ada input karakter baru sebelum jeda waktu yang ditentukan berakhir.
+   
+   Tanpa debouncing, setiap kali pengguna mengetik satu karakter (event `input`), browser akan langsung mengirimkan satu HTTP request ke backend. Jika pengguna mengetik kata `"Universitas Indonesia"` (21 karakter), server akan menerima 21 request dalam beberapa detik. Dengan debouncing, request hanya dikirim 1 kali saat pengguna selesai mengetik. Selain itu, ada kemungkinan terjadinya *race condition* yang disebabkan oleh latensi jaringan dan server yang telat memproses request sesuai urutan.
+
+2. **Jelaskan fungsi dari penggunaan await ketika kita menggunakan fetch()! Apa yang akan terjadi jika kita tidak menggunakan await?**
+
+   `await` digunakan di dalam fungsi `async` untuk menjeda eksekusi baris kode berikutnya sampai objek `Promise` yang dihasilkan oleh operasi asinkronus (misalnya pemanggilan `fetch()` atau `.json()`) selesai dan mengembalikan nilai aslinya berupa objek `Response` atau data JSON.
+   
+   Apa yang terjadi jika tidak menggunakan `await`?
+   - Variabel yang menampung hasil pemanggilan tidak akan berisi objek data, melainkan objek `Promise` yang masih berstatus *pending*.
+   - Ketika mencoba mengakses properti atau membaca data, kode akan langsung mengalami kegagalan/error atau menghasilkan nilai `undefined` karena data dari server belum selesai diambil.
+
+3. **Jelaskan apa itu serangan XSS (Cross-Site Scripting) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!**
+
+   *Cross-Site Scripting* (XSS) adalah jenis kerentanan keamanan web di mana penyerang berhasil menyuntikkan skrip berbahaya ke dalam konten halaman web yang dapat dipercaya. Ketika korban membuka halaman tersebut, skrip tersebut akan dieksekusi oleh browseer korban, memungkinkan penyerang mencuri *session cookie* atau token autentikasi milik korban.
+
+   Mengapa AJAX/JavaScript lebih rentan dibandingkan dengan template Django?
+   - Secara bawaan, template Django secara otomatis melakukan *HTML escaping* pada setiap variabel yang dirender di server. Karakter sensitif seperti `<`, `>`, `&`, `"`, dan `'` otomatis diubah menjadi entitas HTML aman (`&lt;`, `&gt;`, dsb), sehingga aman dari injeksi script biasa.
+   - Pada pola AJAX, data diterima dari server dalam bentuk teks mentah (JSON). Ketika JavaScript merender data tersebut ke antarmuka menggunakan properti seperti `element.innerHTML = completeHtml`, browser akan mem-parsing string tersebut langsung sebagai elemen HTML. Jika data input user mengandung tulisan seperti `<img src="x" onerror="fetch('https://iniwebjahat.com/hahahaha')">` dan tidak disanitasi, browser akan langsung memicu *event handler* tersebut dan mengeksekusi skripnya.
+
+## AI Disclosure Week 5
+
+Dalam pengerjaan *Individual Assignment* 5 ini, saya berkolaborasi secara interaktif dengan asisten AI (Google Antigravity IDE dan Gemini 3.8 Flash) menggunakan pendekatan *pair-programming* yang bertahap dan kritis.
+
+* **Link Gemini** : https://share.gemini.google/07eKpQ1N7d6k
+* **Strategi Prompting**: Saya menerapkan strategi *step-by-step modular prompting*. Tugas dipecah menjadi langkah-langkah terpisah: mulai dari penyesuaian backend JSON, pembuatan kerangka DOM dan *debouncing*, pembuatan modal form berbasis Popover API, integrasi Fetch API POST dengan CSRF dan Toast, hingga sanitasi XSS. Setiap kali AI memberikan saran kode, saya tidak langsung menerapkannya, melainkan menelaah dan mengonfirmasikannya terlebih dahulu dengan kode proyek lokal saya.
+* **Bagian yang Dibantu AI**: AI membantu dalam memberikan pemahaman konseptual mendalam tentang cara kerja *event debouncing* dengan `setTimeout`/`clearTimeout`, pola dasar pengiriman form menggunakan `FormData` dan header `X-CSRFToken` pada Fetch API, serta draf awal pengujian unit test di `tests.py`.
+* **Analisis Kritis Keterbatasan AI & Perbaikan Manual yang Dilakukan**:
+  1. *Ketidaktepatan Desain HTML & CSS*: Saran awal dari AI web cenderung menebak class CSS generik Bootstrap (seperti `btn btn-primary`, `project-form-modal__dialog`, `edu-card`) yang tidak ada di `style.css` portofolio saya. Saya mengoreksi AI dan secara manual mempertahankan class CSS asli (`.edu-timeline__item`, `.edu-timeline__connector`, `.project-form-modal__backdrop`, dsb) agar desain timeline tidak rusak.
+  2. *Komponen Interaktif Star & Hapus yang Terhapus*: AI sempat menyarankan penggantian tombol interaktif star menjadi teks statis biasa, serta mengubah tombol Hapus menjadi tag `<a>` (GET). Saya secara kritis mengoreksi ini karena operasi hapus di Django wajib menggunakan method POST yang aman dengan token CSRF, dan interaksi bintang harus tetap terhubung ke backend.
+  3. *Penanganan Validasi XSS pada ModelForm*: AI awalnya hanya menyarankan `strip_tags()` biasa tanpa melempar `ValidationError` jika teks yang tersisa kosong. Saya menanyakan dan menambahkan validasi eksplisit `ValidationError` agar input yang seluruhnya berisi tag HTML jahat (seperti `<script></script>`) ditolak dengan status HTTP 400 Bad Request.
+
+---
+
 ## Progress Mingguan Week 4
 
 - **Penyelesaian Tutorial 4**

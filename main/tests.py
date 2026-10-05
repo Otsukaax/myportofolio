@@ -1,8 +1,12 @@
+import json
+from datetime import date
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from main.forms import EducationForm
 from main.models import Education, Experience
 
 
@@ -113,44 +117,47 @@ class MainTest(TestCase):
 
 class EducationTest(TestCase):
     def setUp(self):
-        # Skenario 1: Berjalan & ada IPK (Data Anda)
+        self.superuser = User.objects.create_superuser(
+            username="admin_test",
+            password="password123",
+        )
+        self.regular_user = User.objects.create_user(
+            username="user_test",
+            password="password123",
+        )
         self.education = Education.objects.create(
             institution="Universitas Indonesia",
             degree="S1 Ilmu Komputer",
             gpa="4.00",
-            started_at="2024-08-01",
+            started_at=date(2024, 8, 1),
+            ended_at=None,
         )
-        # Skenario 2: Lulus & tanpa IPK
         self.education_completed = Education.objects.create(
             institution="SMAN 1 Surakarta",
             degree="SMA",
             gpa=None,
-            started_at="2021-07-01",
-            ended_at="2024-05-01",
+            started_at=date(2021, 7, 1),
+            ended_at=date(2024, 5, 1),
         )
 
     def test_education_url_is_accessible(self):
         response = self.client.get(reverse("main:show_education"))
-
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education.html")
-
-    def test_education_data_in_response(self):
-        response = self.client.get(reverse("main:show_education"))
-
-        self.assertContains(response, self.education.institution)
-        self.assertContains(response, self.education.degree)
-        self.assertContains(response, self.education.gpa)
+        self.assertContains(response, 'id="education-search-form"')
+        self.assertContains(response, 'id="edu-timeline-container"')
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], EducationForm)
 
     def test_empty_education_page(self):
         Education.objects.all().delete()
         response = self.client.get(reverse("main:show_education"))
-
-        self.assertContains(response, "Belum ada riwayat pendidikan yang ditambahkan.")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education.html")
+        self.assertContains(response, 'id="empty"')
 
     def test_education_navbar_link_on_main(self):
         response = self.client.get(reverse("main:show_main"))
-
         self.assertContains(response, f'href="{reverse("main:show_education")}"')
 
     def test_education_model_properties(self):
@@ -158,12 +165,100 @@ class EducationTest(TestCase):
         self.assertTrue(self.education.is_current)
         self.assertFalse(self.education_completed.is_current)
 
-    def test_completed_education_data_in_response(self):
-        response = self.client.get(reverse("main:show_education"))
-        
-        # Memastikan skenario lulus dirender dengan benar
-        self.assertContains(response, self.education_completed.institution)
-        self.assertContains(response, "Lulus")
-        
-        # Memastikan blok IPK tidak muncul (atau tidak me-render teks 'None')
-        self.assertNotContains(response, '<span class="edu-timeline__gpa-value">None</span>')
+    def test_get_education_json_structure(self):
+        response = self.client.get(reverse("main:get_education_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 2)
+
+        first_item = data[0]
+        self.assertEqual(first_item["pk"], str(self.education.id))
+        self.assertEqual(first_item["fields"]["institution"], "Universitas Indonesia")
+        self.assertEqual(first_item["fields"]["degree"], "S1 Ilmu Komputer")
+        self.assertTrue(first_item["fields"]["is_current"])
+        self.assertEqual(first_item["fields"]["star_count"], 0)
+
+    def test_get_education_json_search_filter(self):
+        response = self.client.get(reverse("main:get_education_json"), {"institution": "Indonesia"})
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["fields"]["institution"], "Universitas Indonesia")
+
+        response_empty = self.client.get(reverse("main:get_education_json"), {"institution": "UGM"})
+        data_empty = json.loads(response_empty.content)
+        self.assertEqual(len(data_empty), 0)
+
+    def test_create_education_ajax_by_superuser_success(self):
+        self.client.login(username="admin_test", password="password123")
+        payload = {
+            "institution": "National University of Singapore",
+            "degree": "Master of Computing",
+            "gpa": "3.90",
+            "started_at": "2025-08-01",
+            "ended_at": "",
+        }
+        response = self.client.post(reverse("main:create_education_ajax"), payload)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Education.objects.filter(institution="National University of Singapore").exists())
+
+    def test_create_education_ajax_by_non_superuser_forbidden(self):
+        payload = {
+            "institution": "Harvard University",
+            "degree": "Computer Science",
+            "started_at": "2024-01-01",
+        }
+        # Guest
+        response_guest = self.client.post(reverse("main:create_education_ajax"), payload)
+        self.assertEqual(response_guest.status_code, 403)
+
+        # Regular user
+        self.client.login(username="user_test", password="password123")
+        response_user = self.client.post(reverse("main:create_education_ajax"), payload)
+        self.assertEqual(response_user.status_code, 403)
+        self.assertFalse(Education.objects.filter(institution="Harvard University").exists())
+
+    def test_create_education_ajax_invalid_data(self):
+        self.client.login(username="admin_test", password="password123")
+        payload = {
+            "institution": "Oxford University",
+            "degree": "Software Engineering",
+            "started_at": "",
+        }
+        response = self.client.post(reverse("main:create_education_ajax"), payload)
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertIn("errors", data)
+
+    def test_clean_institution_and_degree_xss_rejected(self):
+        self.client.login(username="admin_test", password="password123")
+        response = self.client.post(
+            reverse("main:create_education_ajax"),
+            {
+                "institution": '<img src="x" onerror="alert(1)">',
+                "degree": '<script>alert("XSS")</script>',
+                "started_at": "2024-01-01",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Education.objects.filter(started_at="2024-01-01").exists())
+
+    def test_education_form_xss_cleaner(self):
+        form_valid = EducationForm(data={
+            "institution": '<script>alert("XSS")</script>MIT',
+            "degree": "<b>Artificial Intelligence</b>",
+            "started_at": "2023-01-01",
+        })
+        self.assertTrue(form_valid.is_valid())
+        self.assertEqual(form_valid.cleaned_data["institution"], 'alert("XSS")MIT')
+        self.assertEqual(form_valid.cleaned_data["degree"], "Artificial Intelligence")
+
+        form_invalid = EducationForm(data={
+            "institution": "<script></script>",
+            "degree": "<div></div>",
+            "started_at": "2023-01-01",
+        })
+        self.assertFalse(form_invalid.is_valid())
+        self.assertIn("institution", form_invalid.errors)
+        self.assertIn("degree", form_invalid.errors)
