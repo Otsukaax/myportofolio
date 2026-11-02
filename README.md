@@ -1,11 +1,28 @@
-Nama       : Azka Nur Jauhar<br>
-NPM        : 2506612410<br>
-Kelas      : PBP B<br>
-Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
+# Portofolio Pribadi - Pemrograman Berbasis Platform (CSUI)
+
+| Atribut | Informasi |
+| :--- | :--- |
+| **Nama** | Azka Nur Jauhar |
+| **NPM** | 2506612410 |
+| **Kelas** | PBP B |
+| **Tautan PWS** | [https://azka-nur-myportofolio.pws.cs.ui.ac.id/](https://azka-nur-myportofolio.pws.cs.ui.ac.id/) |
+| **Tautan Repositori** | [https://github.com/Otsukaax/myportofolio](https://github.com/Otsukaax/myportofolio) |
+
+---
+
+## Deskripsi Proyek
+Proyek web portofolio dinamis yang dibangun menggunakan framework **Django** untuk mata kuliah Pemrograman Berbasis Platform (PBP), Fakultas Ilmu Komputer, Universitas Indonesia. Proyek ini mengimplementasikan konsep arsitektur *Model-View-Template* (MVT), manajemen autentikasi & *Role-Based Access Control* (RBAC), relasi database, interaksi asinkronus berbasis **AJAX (Fetch API)**, serta alur otomatisasi *Continuous Integration & Continuous Deployment* (**CI/CD**) ke Pacil Web Service (**PWS**).
 
 ---
 
 ## Panduan Menjalankan Proyek (Setup Guide)
+
+### Prasyarat
+- Python 3.10 atau versi yang lebih baru
+- Git
+- Peramban web modern (Google Chrome, Mozilla Firefox, Safari, atau Microsoft Edge)
+
+### Langkah Instalasi & Menjalankan Lokal
 
 1. **Clone repositori dan masuk ke direktori proyek**:
    ```bash
@@ -14,15 +31,16 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
    ```
 
 2. **Membuat dan mengaktifkan virtual environment**:
-   ```bash
-   # Windows
-   python -m venv env
-   .\env\Scripts\activate
-
-   # Linux/macOS
-   python3 -m venv env
-   source env/bin/activate
-   ```
+   - **Windows**:
+     ```bash
+     python -m venv env
+     .\env\Scripts\activate
+     ```
+   - **Linux / macOS**:
+     ```bash
+     python3 -m venv env
+     source env/bin/activate
+     ```
 
 3. **Install dependensi**:
    ```bash
@@ -34,11 +52,23 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
    python manage.py migrate
    ```
 
-5. **Menjalankan server**:
+5. **Menjalankan unit test** *(verifikasi fungsionalitas)*:
+   ```bash
+   python manage.py test
+   ```
+
+6. **Menjalankan server pengembangan**:
    ```bash
    python manage.py runserver
    ```
-   Buka `http://localhost:8000/` pada browser untuk melihat portofolio.
+   Buka tautan [http://localhost:8000/](http://localhost:8000/) pada peramban web untuk melihat aplikasi portofolio.
+
+---
+
+### Alur CI/CD Deployment ke PWS
+Proyek ini telah dikonfigurasi dengan alur deployment otomatis menggunakan **GitHub Actions**:
+- **Branch Pengembangan (`dev`)**: Digunakan untuk pengerjaan fitur baru dan eksperimen tanpa memengaruhi lingkungan produksi.
+- **Branch Produksi (`main`)**: Setiap perubahan yang di-*push* atau di-*merge* ke branch `main` akan secara otomatis memicu alur kerja GitHub Actions untuk melakukan sinkronisasi dan *push* ke branch `master` pada server Pacil Web Service (PWS).
 
 ---
 
@@ -58,7 +88,7 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
 1. **Jelaskan apa itu debouncing dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!**
 
-   Pengertian: *Debouncing* adalah teknik yang menunda eksekusi suatu fungsi sampai beberapa waktu tertentu dari terakhir kali fungsi/event tersebut dipicu. Contoh mekanisme ini diterapkan dalam fitur pencarian dengan memanfaatkan *timer* (`setTimeout`) dan membatalkan *timer* sebelumnya (`clearTimeout`) setiap kali ada input karakter baru sebelum jeda waktu yang ditentukan berakhir.
+   **Pengertian:** *Debouncing* adalah teknik yang menunda eksekusi suatu fungsi sampai beberapa waktu tertentu dari terakhir kali fungsi/event tersebut dipicu. Contoh mekanisme ini diterapkan dalam fitur pencarian dengan memanfaatkan *timer* (`setTimeout`) dan membatalkan *timer* sebelumnya (`clearTimeout`) setiap kali ada input karakter baru sebelum jeda waktu yang ditentukan berakhir.
    
    Tanpa debouncing, setiap kali pengguna mengetik satu karakter (event `input`), browser akan langsung mengirimkan satu HTTP request ke backend. Jika pengguna mengetik kata `"Universitas Indonesia"` (21 karakter), server akan menerima 21 request dalam beberapa detik. Dengan debouncing, request hanya dikirim 1 kali saat pengguna selesai mengetik. Selain itu, ada kemungkinan terjadinya *race condition* yang disebabkan oleh latensi jaringan dan server yang telat memproses request sesuai urutan.
 
@@ -66,17 +96,19 @@ Tautan PWS : http://azka-nur-myportofolio.pws.cs.ui.ac.id/
 
    `await` digunakan di dalam fungsi `async` untuk menjeda eksekusi baris kode berikutnya sampai objek `Promise` yang dihasilkan oleh operasi asinkronus (misalnya pemanggilan `fetch()` atau `.json()`) selesai dan mengembalikan nilai aslinya berupa objek `Response` atau data JSON.
    
-   Apa yang terjadi jika tidak menggunakan `await`?
+   **Apa yang terjadi jika tidak menggunakan `await`?**
    - Variabel yang menampung hasil pemanggilan tidak akan berisi objek data, melainkan objek `Promise` yang masih berstatus *pending*.
    - Ketika mencoba mengakses properti atau membaca data, kode akan langsung mengalami kegagalan/error atau menghasilkan nilai `undefined` karena data dari server belum selesai diambil.
 
 3. **Jelaskan apa itu serangan XSS (Cross-Site Scripting) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!**
 
-   *Cross-Site Scripting* (XSS) adalah jenis kerentanan keamanan web di mana penyerang berhasil menyuntikkan skrip berbahaya ke dalam konten halaman web yang dapat dipercaya. Ketika korban membuka halaman tersebut, skrip tersebut akan dieksekusi oleh browseer korban, memungkinkan penyerang mencuri *session cookie* atau token autentikasi milik korban.
+   *Cross-Site Scripting* (XSS) adalah jenis kerentanan keamanan web di mana penyerang berhasil menyuntikkan skrip berbahaya ke dalam konten halaman web yang dapat dipercaya. Ketika korban membuka halaman tersebut, skrip tersebut akan dieksekusi oleh browser korban, memungkinkan penyerang mencuri *session cookie* atau token autentikasi milik korban.
 
-   Mengapa AJAX/JavaScript lebih rentan dibandingkan dengan template Django?
+   **Mengapa AJAX/JavaScript lebih rentan dibandingkan dengan template Django?**
    - Secara bawaan, template Django secara otomatis melakukan *HTML escaping* pada setiap variabel yang dirender di server. Karakter sensitif seperti `<`, `>`, `&`, `"`, dan `'` otomatis diubah menjadi entitas HTML aman (`&lt;`, `&gt;`, dsb), sehingga aman dari injeksi script biasa.
    - Pada pola AJAX, data diterima dari server dalam bentuk teks mentah (JSON). Ketika JavaScript merender data tersebut ke antarmuka menggunakan properti seperti `element.innerHTML = completeHtml`, browser akan mem-parsing string tersebut langsung sebagai elemen HTML. Jika data input user mengandung tulisan seperti `<img src="x" onerror="fetch('https://iniwebjahat.com/hahahaha')">` dan tidak disanitasi, browser akan langsung memicu *event handler* tersebut dan mengeksekusi skripnya.
+
+---
 
 ## AI Disclosure Week 5
 
@@ -99,6 +131,8 @@ Dalam pengerjaan *Individual Assignment* 5 ini, saya berkolaborasi secara intera
 - **Penambahan Relasi ManyToMany (Fitur Star):** Menambahkan field `starred_by` pada model `Experience` dan `Education` agar pengguna terdaftar dapat memberi interaksi bintang.
 - **Implementasi Role-based Access Control:** Membatasi fitur manipulasi data sesuai peran pengguna (Guest, User, Editor, dan Superuser). Superuser memiliki hak penuh (CRUD), Editor hanya dapat melakukan fungsi pembaruan data (Update), pengguna biasa dapat memberi interaksi bintang, dan pengunjung (*guest*) hanya dapat membaca data.
 
+---
+
 ## AI Disclosure Week 4
 
 Dalam pengerjaan *Individual Assignment* 4 kali ini, saya mematuhi instruksi modul dan menambahkan logika otorisasi tingkat lanjut (termasuk implementasi peran Editor) menggunakan bantuan asisten AI (Google Antigravity IDE / Gemini 3.1 Pro).
@@ -115,7 +149,7 @@ Dalam pengerjaan *Individual Assignment* 4 kali ini, saya mematuhi instruksi mod
 - **Implementasi CRUD pada Experience:** Menambahkan fitur *Create, Read, Update,* dan *Delete* untuk model `Experience`.
 - **Penambahan Fitur Pencarian:** Menambahkan fitur filter/pencarian (*search filter*) pada halaman `Experience`.
 - **Pembuatan Unit Test:** Menambahkan *CRUD test* untuk fitur `Experience` demi memastikan fungsi berjalan dengan baik.
-- **Penambahan _Character Counter_ pada _experience form_:** Menambahkan _character counter_ pada _form_ add _experience_.
+- **Penambahan Character Counter pada Form Experience:** Menambahkan *character counter* pada form *add experience*.
 
 ---
 
@@ -135,7 +169,9 @@ Dalam pengerjaan *Individual Assignment* 4 kali ini, saya mematuhi instruksi mod
 
    **Alur:** Di portofolioku, misalkan ketika URL `/experience/json/` diakses, `urls.py` akan memanggil fungsi view `get_experience_json`. Di dalam fungsi tersebut, data dari database diambil menggunakan `Experience.objects.all()`. Kemudian, data-data tersebut dikonversi menjadi format JSON dengan menggunakan `serializers.serialize("json", experience_list)`. Data JSON tersebut baru dikirim kembali lewat `HttpResponse` dengan *content-type* `"application/json"`.
 
-   **Alasan *serialization*:** Objek yang diambil dari database (seperti objek model `Experience` dan `Education`) bentuk aslinya adalah *Python Objects*. Format objek Python ini tidak bisa langsung dikirim begitu saja melalui protokol HTTP untuk dibaca oleh browser. Jadi, kita perlu menggunakan *serialization* untuk menerjemahkan objek Python tersebut menjadi format yang universal, seperti JSON.
+   **Alasan Serialization:** Objek yang diambil dari database (seperti objek model `Experience` dan `Education`) bentuk aslinya adalah *Python Objects*. Format objek Python ini tidak bisa langsung dikirim begitu saja melalui protokol HTTP untuk dibaca oleh browser. Jadi, kita perlu menggunakan *serialization* untuk menerjemahkan objek Python tersebut menjadi format yang universal, seperti JSON.
+
+---
 
 ## AI Disclosure Week 3
 
@@ -171,12 +207,15 @@ Dalam pengerjaan Tugas Individu 3 kali ini, saya mengerjakan instruksi yang dibe
    * `makemigrations` berfungsi untuk mencatat perubahan yang kita buat pada file `models.py`, lalu menyimpannya sebagai file baru di folder `migrations/` (misalnya file `0003_education.py`). Perintah ini hanya menyiapkan instruksi perubahannya saja dan belum mengubah isi database.
    * `migrate` berfungsi untuk menerapkan instruksi yang ada di file tersebut ke dalam database. Django akan membaca file migrasi dan mengeksekusi perintah SQL ke database fisik.
    
-   **Contoh Perubahan Model**:
+   **Contoh Perubahan Model:**  
    Ketika saya membuat model baru `Education` di `main/models.py` (dengan atribut nama institusi, gelar, IPK, waktu mulai, dan waktu selesai):
    1. Database SQLite awalnya belum memiliki tabel untuk data tersebut.
    2. Saya menjalankan `python manage.py makemigrations` untuk membuat file rancangan migrasi `0003_education.py`.
    3. Selanjutnya, saya menjalankan `python manage.py migrate` agar tabel `main_education` benar-benar dibuat di dalam database SQLite.
+   
    Kedua perintah ini juga wajib dijalankan jika di kemudian hari saya menambah kolom baru (misalnya kolom `description` pada model `Education`), mengubah tipe data suatu kolom, atau menghapus kolom yang sudah ada. 
+
+---
 
 ## AI Disclosure Week 2
 
@@ -192,19 +231,21 @@ Dalam pengerjaan Tugas Individu 2 kali ini, saya mengerjakan instruksi yang dibe
 
 ### Tugas 1
 
-1. Ya, dalam merancang struktur HTML, saya menggunakan elemen semantik HTML5 seperti `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, dan `<footer>`. Elemen-elemen ini sangat membantu dalam membuat *static web* karena memberikan struktur yang mudah dipahami, dimaintain, dan dikelola oleh orang yang membaca kode. Misalnya, saya menggunakan `<section>` untuk menyusun bagian-bagian homepage seperti "Profile" dan "Skills". Selain itu, saya juga menggunakaan `<article>` untuk komponen di section skills.
+1. Ya, dalam merancang struktur HTML, saya menggunakan elemen semantik HTML5 seperti `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, dan `<footer>`. Elemen-elemen ini sangat membantu dalam membuat *static web* karena memberikan struktur yang mudah dipahami, dimaintain, dan dikelola oleh orang yang membaca kode. Misalnya, saya menggunakan `<section>` untuk menyusun bagian-bagian homepage seperti "Profile" dan "Skills". Selain itu, saya juga menggunakan `<article>` untuk komponen di section skills.
 
 2. Tantangan saya saat mengatur CSS agar *responsive* adalah memastikan susunan *layout* berbasis *grid* dapat ditampilkan dengan mulus menjadi susunan yang rapi di layar kecil seperti *smartphone*. Contoh penerapannya, pada layar *desktop*, *skill card* dibuat dalam *grid* 2 kolom. Namun, pada ukuran layar yang lebih kecil seperti tablet (`max-width: 820px`), saya mengurangi jumlah kolom *grid* menjadi 1. Pada layar *smartphone* yang lebih kecil lagi (`max-width: 480px`), tata letak di dalam kartu itu sendiri saya ubah dari baris (`flex-direction: row`) menjadi kolom (`flex-direction: column`) agar gambar berada di atas teks dan ukuran konten tetap proporsional serta nyaman dibaca.
 
 3. Karena portofolio saat ini masih berupa *static web* murni, batasan utama saat ini adalah repot saat ingin memperbarui konten. Setiap kali saya ingin menambah skill atau proyek baru, saya harus mengedit file HTML secara manual. Untuk selanjutnya, saya berencana menghubungkannya ke database menggunakan Django agar data portofolio bisa ditambah atau diedit langsung lewat browser tanpa perlu utak-atik kodingan lagi.
 
+---
+
 ## AI Disclosure Week 1
 
-Dalam pengerjaan tugas individu 1 kali ini, saya membuat section berupa *Skills & Expertise* yang bertujuan untuk menampilkan beberapa keahlian yang sudah saya pelajari. Sebelum menggunakan AI, saya buat sendiri isi-isi yang ingin saya tulis beserta keterangannya yang masih berupa tulisan kasar. Saya hias sesuai imajinasi saya waktu itu, yaitu dengan membuat grip kotak-kotak sederhana pada sesi lab Rabu lalu. Namun setelah itu, saya mencari inspirasi desain *website* dari internet dan juga dari *website* yang dulu pernah saya buat saat SMA. Kemudian, saya menemukan referensi yang cocok dari internet. Lalu, saya meminta bantuan AI (Gemini 3.1 Pro) dengan memasukkan gambar referensi tersebut untuk meng-generate kode HTML dan CSS-nya.
+Dalam pengerjaan tugas individu 1 kali ini, saya membuat section berupa *Skills & Expertise* yang bertujuan untuk menampilkan beberapa keahlian yang sudah saya pelajari. Sebelum menggunakan AI, saya buat sendiri isi-isi yang ingin saya tulis beserta keterangannya yang masih berupa tulisan kasar. Saya hias sesuai imajinasi saya waktu itu, yaitu dengan membuat grid kotak-kotak sederhana pada sesi lab Rabu lalu. Namun setelah itu, saya mencari inspirasi desain *website* dari internet dan juga dari *website* yang dulu pernah saya buat saat SMA. Kemudian, saya menemukan referensi yang cocok dari internet. Lalu, saya meminta bantuan AI (Gemini 3.1 Pro) dengan memasukkan gambar referensi tersebut untuk meng-generate kode HTML dan CSS-nya.
 
-Namun, hasil kode yang dihasilkan AI tidak terlalu sempurna untuk saya. Layout CSS nya belum menyesuaikan elemen yang sudah ada sebelumnya dan juga dan tampilannya belum adaptif ketika dibuka di layar HP. Selain itu, link dan path gambarnya masih berupa *placeholder*. Oleh karena itu, saya melakukan perbaikan manual, seperti menyesuaikan font, warna elemen, dan ukuran-ukuran dari elemen di section tersebut, merapikan grid serta tampilan media di style.css, serta mengubah link rujukan di index.html. Selain itu, saya juga memanfaatkan AI untuk membuat animasi elemen-elemen *website*nya.
+Namun, hasil kode yang dihasilkan AI tidak terlalu sempurna untuk saya. Layout CSS nya belum menyesuaikan elemen yang sudah ada sebelumnya dan tampilannya belum adaptif ketika dibuka di layar HP. Selain itu, link dan path gambarnya masih berupa *placeholder*. Oleh karena itu, saya melakukan perbaikan manual, seperti menyesuaikan font, warna elemen, dan ukuran-ukuran dari elemen di section tersebut, merapikan grid serta tampilan media di style.css, serta mengubah link rujukan di index.html. Selain itu, saya juga memanfaatkan AI untuk membuat animasi elemen-elemen *website*nya.
 
-Terakhir, saya menggunakan AI agent dari Visual Studio Code sendiri untuk membantu merapikan kode yang sebelumnya terlihat berantakan. Pemberian komentar pembatas seperti `<!-- Section: Skills -->` dari AI membantu saya meemisahkan antar-*section* agar struktur kode menjadi lebih terorganisasi, rapi, dan mudah dibaca.
+Terakhir, saya menggunakan AI agent dari Visual Studio Code sendiri untuk membantu merapikan kode yang sebelumnya terlihat berantakan. Pemberian komentar pembatas seperti `<!-- Section: Skills -->` dari AI membantu saya memisahkan antar-*section* agar struktur kode menjadi lebih terorganisasi, rapi, dan mudah dibaca.
 
 Meskipun saya cukup banyak memanfaatkan bantuan AI, saya tetap berusaha mencari tahu dan memahami logika serta cara kerja dari setiap baris kode yang telah di-*generate*. Saya menelusuri bagaimana CSS memengaruhi elemen-elemen yang ada di kode html beserta animasi yang dilakukannya, serta mempelajari tag semantik dan class yang digunakan di HTML. Intinya, AI saya pakai untuk mempercepat proses belajar dan mengoding, sementara konsep ide tetap berada di tangan saya sendiri.
 
