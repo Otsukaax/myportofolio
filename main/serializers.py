@@ -38,6 +38,13 @@ class ExperienceSerializer(serializers.ModelSerializer):
     def validate_description(self, value):
         return strip_tags(value)
 
+    def to_internal_value(self, data):
+        if hasattr(data, "copy"):
+            data = data.copy()
+            if data.get("ended_at") == "":
+                data["ended_at"] = None
+        return super().to_internal_value(data)
+
     def get_category_display(self, obj):
         return obj.get_category_display()
 
