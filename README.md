@@ -72,6 +72,12 @@ Proyek ini telah dikonfigurasi dengan alur deployment otomatis menggunakan **Git
 
 ---
 
+## Progress Mingguan Week 7
+
+- **Menyelesaikan Tutorial 7**
+
+---
+
 ## Progress Mingguan Week 5
 
 - **Penyelesaian Tutorial 5**
