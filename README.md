@@ -74,8 +74,87 @@ Proyek ini telah dikonfigurasi dengan alur deployment otomatis menggunakan **Git
 
 ## Progress Mingguan Week 7
 
-- **Menyelesaikan Tutorial 7**
+- **Penyelesaian Tutorial 7 & Individual Assignment 6**
+- **Implementasi Django REST Framework (DRF) Serializer:** Membuat EducationSerializer dengan pendaftaran *fields* eksplisit, *field* kalkulasi *read-only* (is_current, star_count, is_starred, starred_by_names), serta sanitasi input menggunakan strip_tags().
+- **Implementasi RESTful API Endpoints:** Membangun endpoint berbasis fungsi @api_view di /api/v1/educations/ untuk operasi list (GET, POST), detail (GET, PUT, PATCH, DELETE), dan toggle star (POST) dengan kode status HTTP terstandarisasi (200, 201, 204, 400, 403, 404).
+- **Penerapan Hak Akses Berlapis (Role-Based Access Control):** Menggunakan IsPortfolioOwnerOrEditorOrReadOnly dan IsAuthenticated untuk menegakkan aturan akses 4 peran (Guest, User biasa, Editor, dan Superuser) langsung di level server/API.
+- **Integrasi Frontend AJAX Tanpa Reload:** Memperbarui antarmuka education.html agar menampilkan data, pencarian *real-time* (debouncing 300ms), penambahan data, interaksi bintang, dan penghapusan data secara asinkronus via Fetch API dengan notifikasi Toast interaktif.
+- **Fitur Ekstra Modal Edit Interaktif (Kriteria Skor 4):** Menyediakan form popover modal edit interaktif dengan *pre-fill* data otomatis yang memungkinkan Editor dan Superuser memperbarui data riwayat pendidikan via method PUT/PATCH secara asinkron tanpa *reload* dokumen.
+- **Optimasi Database & Pengujian Menyeluruh:** Mengoptimalkan pembacaan relasi data menggunakan .prefetch_related('starred_by') untuk mencegah masalah query N+1, serta menambahkan pengujian unit komprehensif pada 	ests_api.py (total 47 tes app main lulus 100%).
 
+---
+
+### Tugas 6
+
+1. **Jelaskan apa yang dimaksud dengan REST dan mengapa mengembalikan JSON saja belum cukup untuk menyebut sebuah API sebagai RESTful! Jelaskan pula perbedaan PUT dan PATCH beserta contoh kapan masing-masing sebaiknya digunakan!**
+
+   - REST (*Representational State Transfer*) adalah gaya arsitektur perangkat lunak untuk sistem terdistribusi yang memanfaatkan protokol komunikasi *stateless* dengan memanipulasi *resource* melalui URI dan method standar.
+   - Kenapa JSON belum cukup? JSON hanyalah format representasi/serialisasi data mentah. Sebuah API baru dapat dikatakan *RESTful* jika memenuhi prinsip-prinsip arsitektur REST, di antaranya:
+     - **Resource-Oriented URI:** endpoint dinamai berdasarkan kata benda representasi *resource* (misalnya `/api/v1/educations/`)
+     - **Uniform Interface & Standard HTTP Methods:** Menggunakan kata kerja HTTP sesuai semantiknya (`GET`/`HEAD` untuk membaca, `POST` untuk membuat, `PUT` untuk mengganti total, `PATCH` untuk memperbarui sebagian, dan `DELETE` untuk menghapus) serta mengembalikan status code HTTP yang standar (`200 OK`, `201 Created`, `204 No Content`, `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`).
+     - **Statelessness:** Setiap request dari klien ke server harus memuat semua informasi yang dibutuhkan secara lengkap tanpa mengandalkan status konteks sesi yang disimpan di memori server secara dependen.
+   - **Perbedaan PUT dan PATCH:**
+     - **`PUT` (Full Replacement):** Digunakan untuk mengganti seluruh representasi resource dengan payload yang baru dikirim secara menyeluruh. Klien mengirimkan semua atribut; atribut yang tidak dikirim idealnya dianggap direset atau dikosongkan oleh server.
+       - *Contoh Penggunaan:* Saat form modal edit riwayat pendidikan mengirimkan pembaruan untuk seluruh field sekaligus (institusi, jenjang/program studi, IPK, tanggal mulai, dan tanggal selesai).
+     - **`PATCH` (Partial Update):** Digunakan untuk memperbarui sebagian (*partial update*) dari atribut resource tanpa memengaruhi atribut lainnya.
+       - *Contoh Penggunaan:* Ketika aplikasi hanya ingin memperbarui status aktif/lulus (`ended_at`), memperbarui nilai IPK saja, atau saat fitur *toggle star* memperbarui daftar pengguna yang membintangi tanpa perlu mengirim ulang data riwayat pendidikan lainnya.
+
+2. **Jelaskan peran serializer pada Django REST Framework! Apa keuntungannya dibandingkan merakit dictionary secara manual dengan JsonResponse seperti pada Tutorial 05?**
+
+   - **Peran Serializer:** Serializer pada DRF bertindak sebagai jembatan dua arah (*two-way converter*) antara objek kompleks Django dan format data universal:
+     1. **Serialization:** Mengonversi objek model/QuerySet Django yang kompleks menjadi struktur data primitif Python (seperti *dictionary*) yang siap dirender ke dalam JSON.
+     2. **Deserialization & Validation:** Menerima data masukan mentah dari request (JSON), memvalidasi integritas dan keamanannya melalui aturan schema atau method `validate_<field>()`, lalu menginstansiasinya kembali menjadi objek model database yang siap disimpan (`.save()`).
+   - **Keuntungan Dibandingkan Merakit Dictionary Manual (`JsonResponse` Tutorial 05):**
+     - **Menghilangkan Boilerplate & Duplikasi Kode (DRY):** Tidak perlu lagi menulis perulangan `for` dan merakit dictionary secara manual field-per-field setiap kali ingin mengirim data JSON.
+     - **Validasi Terintegrasi dan Deklaratif:** Serializer otomatis memeriksa tipe data, batas karakter (*maxlength*), keharusan pengisian (*required*), serta format angka/tanggal melalui `is_valid(raise_exception=True)`. Pada `JsonResponse` manual, seluruh logika validasi dan penanganan error harus dirangkai sendiri secara manual.
+     - **Dukungan Relasi Kompleks & Computed Fields:** Memudahkan penanganan relasi database (seperti *ManyToMany* `starred_by`) dan pembuatan *computed field* melalui `SerializerMethodField` (misalnya `is_current`, `star_count`, dan `is_starred`) dengan integrasi optimasi query seperti `.prefetch_related()`.
+
+3. **Jelaskan perbedaan autentikasi dan otorisasi pada Django REST Framework! Mengapa hak akses harus diperiksa dengan permission class di server, bukan hanya dengan menyembunyikan tombol di template?**
+
+   - **Perbedaan Autentikasi dan Otorisasi:**
+     - **Autentikasi:** Proses untuk memverifikasi identitas pengguna yang melakukan request (apakah pengguna terdaftar dan memiliki sesi/kredensial yang valid). Di DRF, contohnya diatur via `@authentication_classes([SessionAuthentication])`.
+     - **Otorisasi:** Proses untuk menentukan apakah pengguna yang sudah teridentifikasi memiliki hak akses untuk membaca atau memanipulasi *resource* tertentu. Di DRF, ini diatur melalui permission classes seperti `IsPortfolioOwnerOrEditorOrReadOnly` dan `IsAuthenticated`.
+   - **Mengapa Hak Akses Harus Diperiksa di Server (Permission Class):**
+     - Menyembunyikan tombol pada antarmuka/template hanyalah aspek kenyamanan visual (*User Experience* / UX), bukan keamanan (*Security*).
+     - Pengguna atau penyerang dapat dengan mudah memicu request HTTP mutasi (seperti `POST`, `PUT`, atau `DELETE`) secara langsung ke endpoint API menggunakan *browser developer tools (Console/Fetch API)*, cURL, atau Postman tanpa perlu mengeklik tombol yang ada di layar.
+     - Pemeriksaan di sisi server melalui *permission class* bertindak sebagai gerbang pengamanan absolut yang menolak request yang tidak sah secara konsisten di tingkat backend dengan status HTTP `401 Unauthorized` atau `403 Forbidden`.
+
+4. **Jelaskan mengapa permintaan yang mengubah data tetap memerlukan token CSRF ketika API memakai SessionAuthentication! Mengapa test yang memakai force_authenticate tidak cukup untuk membuktikan bahwa perlindungan CSRF berjalan?**
+
+   - **Alasan Perlunya Token CSRF pada `SessionAuthentication`:**
+     - `SessionAuthentication` mengandalkan cookie sesi browser (`sessionid`) untuk mengenali pengguna yang login.
+     - Browser secara otomatis akan selalu menyertakan cookie tersebut pada setiap request ke domain yang dituju, termasuk jika request tersebut dipicu secara tersembunyi oleh situs berbahaya pihak ketiga (*Cross-Site Request Forgery* / CSRF).
+     - Tanpa token CSRF, situs jahat dapat membuat browser korban mengirimkan request mutasi data (seperti `POST`, `PUT`, `DELETE`) atas nama korban yang sedang login tanpa sepengetahuannya. Oleh karena itu, token rahasia `X-CSRFToken` wajib disertakan pada header request untuk memastikan bahwa mutasi data benar-benar berasal dari antarmuka aplikasi portofolio yang sah.
+   - **Mengapa Test dengan `force_authenticate` Tidak Cukup:**
+     - Method `force_authenticate` pada pustaka pengujian DRF bekerja dengan langsung menyuntikkan objek `user` dummy ke dalam request dan **melewati (bypass)** seluruh middleware autentikasi bawaan, termasuk *CSRF validation check*.
+     - Akibatnya, pengujian yang menggunakan `force_authenticate` hanya menguji logika permission dan logika view, tetapi sama sekali tidak menguji apakah pertahanan CSRF aktif dan berfungsi normal dalam menolak request tanpa token.
+     - Untuk membuktikan perlindungan CSRF bekerja secara nyata, pengujian harus dilakukan dengan klien pengujian yang menegakkan pemeriksaan CSRF (`enforce_csrf_checks=True`) atau menggunakan alur login standar berbasis cookie sesi.
+
+---
+
+## AI Disclosure Week 6
+
+Dalam pengerjaan Tugas Individu 6 kali ini, saya menerapkan prinsip kolaborasi kritis bersama AI Assistant (*Antigravity* berbasis model *Gemini 3.8 Flash*) untuk membantu membedah alur arsitektur RESTful API, merancang struktur pengujian unit test yang komprehensif, dan mengaudit keamanan aplikasi.
+
+* **Log Percakapan Lengkap**: Riwayat transkrip percakapan utuh dari awal hingga akhir telah diabadikan secara transparan pada berkas [`AI_CHAT_LOG.md`](AI_CHAT_LOG.md).
+* **Strategi Prompting**:
+  1. *Pseudocode-First Approach*: Sebelum menulis atau menyentuh kode, saya meminta AI merancang seluruh alur logika backend (API views) dan frontend (AJAX) ke dalam bentuk *pseudocode* agar saya memahami setiap tahapan proses komunikasi data secara konseptual.
+  2. *Modular Step-by-Step Prompting*: Pengerjaan dipecah menjadi tahapan-tahapan kecil yang terisolasi (Tahap 1: Serializer $\rightarrow$ Tahap 2: API Views & Routing $\rightarrow$ Tahap 3: Integrasi Frontend AJAX & Modal Edit $\rightarrow$ Tahap 4: Unit Testing), di mana setiap tahap diuji dan diverifikasi secara mandiri sebelum lanjut ke tahap berikutnya.
+  3. *Critical Questioning*: Saya aktif menelusuri dan mempertanyakan setiap fungsi yang disarankan jika dirasa asing atau berada di luar cakupan panduan resmi dari dosen.
+
+* **Bagian yang Dibantu oleh AI**:
+  * Merumuskan skenario pengujian komprehensif pada `main/tests_api.py` yang mencakup 4 peran pengguna (*Guest*, *Regular User*, *Editor*, dan *Superuser*), penolakan mutasi database, serta verifikasi proteksi CSRF.
+  * Membantu membedah rubrik penilaian untuk memastikan kriteria skor 4 (seperti optimasi query database `.prefetch_related()` dan modal interaktif edit) terpenuhi.
+  * Melakukan review keamanan pada integrasi AJAX terhadap potensi celah XSS dan kelengkapan header `X-CSRFToken`.
+
+* **Analisis Kritis Keterbatasan AI**:
+  1. *Keterbatasan Konteks Materi Kuliah vs Kode Nyata*: Pada tahap pembuatan serializer, AI sempat mengusulkan penggunaan method lanjutan `to_internal_value` untuk menangani input tanggal kosong `ended_at`. Padahal method ini tergolong *overengineered* dan tidak pernah diajarkan di slide materi perkuliahan. Hal ini terjadi karena AI kurang peka bahwa modul panduan dosen menggunakan model `Project` (yang hanya berisi field teks dan URL sederhana tanpa tanggal opsional).
+  2. *Keterbatasan dalam Menangkap Konteks Logika Template Dinamis*: AI sempat melewatkan peletakan tag `{% csrf_token %}` di luar blok kondisional `{% if %}`. Karena form modal hanya dirender untuk Superuser dan Editor, pengguna biasa yang membuka halaman tidak akan memiliki input CSRF di DOM sehingga browser tidak membuat cookie `csrftoken`. Akibatnya, aksi interaktif Star bagi pengguna biasa akan ditolak oleh server dengan status `403 CSRF Failed: CSRF cookie not set`.
+
+* **Perbaikan dan Koreksi Manual yang Dilakukan**:
+  * **Penyederhanaan Serializer**: Saya menolak pendekatan `to_internal_value` dan mempertahankan struktur `EducationSerializer` agar 100% konsisten dengan template standar materi tutorial. Sebagai gantinya, penanganan tanggal kosong diselesaikan secara bersih dan wajar di frontend JavaScript dengan mengubah string kosong menjadi `null` (`fields.get('ended_at') || null`).
+  * **Koreksi Penempatan CSRF**: Menempatkan tag `{% csrf_token %}` secara eksplisit di luar blok kondisional (tepat di atas tag pembuka `<script>`), menjamin seluruh pengguna yang login memiliki cookie keamanan saat berinteraksi.
+  * **Penyusunan Kode Frontend Mandiri**: Saya menulis dan mengintegrasikan sendiri elemen modal HTML popover edit (`#edit-education-modal`), fungsi *pre-fill* form otomatis dari `dataset`, serta perbaikan entitas tombol penutup modal (`&times;`).
 ---
 
 ## Progress Mingguan Week 5
