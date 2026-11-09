@@ -199,8 +199,15 @@ async function fetchExperiences(searchQuery = '') {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const experiences = await response.json();
-        gridContainer.replaceChildren(...experiences.map(buildExperienceCardElement));
-        displayPageSection({ showGrid: experiences.length > 0, showEmpty: experiences.length === 0 });
+        gridContainer.innerHTML = '';
+        if (experiences.length === 0) {
+            displayPageSection({ showEmpty: true });
+        } else {
+            experiences.forEach(function(exp) {
+                gridContainer.appendChild(buildExperienceCardElement(exp));
+            });
+            displayPageSection({ showGrid: true });
+        }
     } catch (error) {
         if (error.name === 'AbortError') return;
         console.error(error);
